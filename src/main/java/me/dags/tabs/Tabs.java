@@ -46,9 +46,7 @@ public class Tabs {
 
     private static void refreshTabName(Player player) {
         player.getTabList().getEntry(player.getUniqueId()).ifPresent(entry -> {
-            Text name = tabName(player);
-            entry.setDisplayName(name);
-            player.sendMessage(name);
+            entry.setDisplayName(tabName(player));
         });
     }
 
