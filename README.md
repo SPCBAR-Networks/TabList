@@ -1,10 +1,10 @@
 # TabList
 
 ### Usage:
-_Requires a permission plugin that supports 'Permission Options'_
+_Requires a permission plugin that supports '[Subject Options](https://docs.spongepowered.org/stable/en-GB/plugin/permissions.html#subject-options)'_
 
-Permission Option Name: `tablist:format`  
-Permission Option Value: `{name}`  
+Subject Option Name: `tablist:format`  
+Subject Option Value: `{name}`  
 Where `{name}` will be replaced by the user's name. [TextMU strings](https://github.com/dags-/TextMU/wiki/Notation) are supported for color/style formatting.
 
 ### Example Using PermissionsEx Commands:
