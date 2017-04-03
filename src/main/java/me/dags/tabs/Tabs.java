@@ -1,5 +1,6 @@
 package me.dags.tabs;
 
+import me.dags.textmu.MarkupSpec;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
@@ -12,10 +13,6 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyle;
-import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +20,10 @@ import java.util.concurrent.TimeUnit;
  * @author dags <dags@dags.me>
  */
 @Plugin(id = "tablist", name = "TabList", version = "0.1", description = "-_-")
-public class Tabs {
+public final class Tabs {
+
+    private static final String FORMAT_OPTION = "tablist:format";
+    private static final MarkupSpec spec = MarkupSpec.create();
 
     @Listener
     public void init(GameInitializationEvent event) {
@@ -33,53 +33,41 @@ public class Tabs {
     @Listener
     public void reload(GameReloadEvent event) {
         Sponge.getServer().getOnlinePlayers().forEach(Tabs::refreshTabName);
-        Sponge.getServer().getOnlinePlayers().forEach(Tabs::syncOnlineTabs);
+        Sponge.getServer().getOnlinePlayers().forEach(Tabs::syncTabs);
     }
 
     @Listener(order = Order.POST)
     public void onJoin(ClientConnectionEvent.Join event, @Root Player player) {
         Task.builder().execute(() -> {
             refreshTabName(player);
-            syncOnlineTabs(player);
+            syncTabs(player);
         }).submit(this);
     }
 
     private static void refreshTabName(Player player) {
-        player.getTabList().getEntry(player.getUniqueId()).ifPresent(entry -> {
-            entry.setDisplayName(tabName(player));
-        });
+        player.getTabList().getEntry(player.getUniqueId()).ifPresent(entry -> entry.setDisplayName(loadTabName(player)));
     }
 
-    private static void syncOnlineTabs(Player player) {
+    private static void syncTabs(Player player) {
         for (Player online : Sponge.getServer().getOnlinePlayers()) {
-            syncTabs(player, online);
+            syncTabNames(player, online);
         }
     }
 
-    private static void syncTabs(Player one, Player two) {
-        Text oneName = one.getTabList().getEntry(one.getUniqueId()).flatMap(TabListEntry::getDisplayName).orElse(tabName(one));
-        Text twoName = two.getTabList().getEntry(two.getUniqueId()).flatMap(TabListEntry::getDisplayName).orElse(tabName(two));
-        one.getTabList().getEntry(two.getUniqueId()).ifPresent(entry -> entry.setDisplayName(twoName));
-        two.getTabList().getEntry(one.getUniqueId()).ifPresent(entry -> entry.setDisplayName(oneName));
+    private static void syncTabNames(Player one, Player two) {
+        one.getTabList().getEntry(two.getUniqueId()).ifPresent(entry -> entry.setDisplayName(getTabName(two)));
+        two.getTabList().getEntry(one.getUniqueId()).ifPresent(entry -> entry.setDisplayName(getTabName(one)));
     }
 
-    private static Text tabName(Player player) {
-        Text.Builder builder = Text.builder(player.getName());
+    private static Text getTabName(Player player) {
+        return player.getTabList().getEntry(player.getUniqueId())
+                .flatMap(TabListEntry::getDisplayName)
+                .orElse(loadTabName(player));
+    }
 
-        Sponge.getRegistry().getAllOf(TextColor.class)
-                .stream()
-                .filter(color -> color != TextColors.NONE && color != TextColors.RESET)
-                .filter(color -> player.hasPermission("tablist.color." + color.getName().toLowerCase()))
-                .findFirst()
-                .ifPresent(builder::color);
-
-        Sponge.getRegistry().getAllOf(TextStyle.Base.class)
-                .stream()
-                .filter(style -> style != TextStyles.NONE && style != TextStyles.RESET)
-                .filter(style -> player.hasPermission("tablist.style." + style.getName().toLowerCase()))
-                .map(builder.getStyle()::and)
-                .forEach(builder::style);
-
-        return builder.build();
+    private static Text loadTabName(Player player) {
+        return player.getOption(Tabs.FORMAT_OPTION)
+                .map(format -> spec.template(format).with("name", player.getName()).render())
+                .orElse(Text.of(player.getName()));
     }
 }
