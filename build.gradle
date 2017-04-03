@@ -27,7 +27,7 @@ shadowJar {
     dependencies {
         include dependency('com.github.dags-:TextMU')
     }
-    relocate 'me.dags.textmu', 'me.dags.chat.libs.textmu'
+    relocate 'me.dags.textmu', 'me.dags.tabs.libs.textmu'
     archiveName = "${baseName}-${version}-SpongeAPI-${spongeAPI}.jar"
 }
 
