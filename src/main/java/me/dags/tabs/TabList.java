@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
  * @author dags <dags@dags.me>
  */
 @Plugin(id = "tablist", name = "TabList", version = "0.2", description = "-_-")
-public final class Tabs {
+public final class TabList {
 
     private static final String FORMAT_OPTION = "tablist:format";
     private static final MarkupSpec spec = MarkupSpec.create();
@@ -32,8 +32,8 @@ public final class Tabs {
 
     @Listener
     public void reload(GameReloadEvent event) {
-        Sponge.getServer().getOnlinePlayers().forEach(Tabs::refreshTabName);
-        Sponge.getServer().getOnlinePlayers().forEach(Tabs::syncTabs);
+        Sponge.getServer().getOnlinePlayers().forEach(TabList::refreshTabName);
+        Sponge.getServer().getOnlinePlayers().forEach(TabList::syncTabs);
     }
 
     @Listener(order = Order.POST)
@@ -66,7 +66,7 @@ public final class Tabs {
     }
 
     private static Text loadTabName(Player player) {
-        return player.getOption(Tabs.FORMAT_OPTION)
+        return player.getOption(TabList.FORMAT_OPTION)
                 .map(format -> spec.template(format).with("name", player.getName()).render())
                 .orElse(Text.of(player.getName()));
     }
