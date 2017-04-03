@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * @author dags <dags@dags.me>
  */
-@Plugin(id = "tablist", name = "TabList", version = "0.1", description = "-_-")
+@Plugin(id = "tablist", name = "TabList", version = "0.2", description = "-_-")
 public final class Tabs {
 
     private static final String FORMAT_OPTION = "tablist:format";
