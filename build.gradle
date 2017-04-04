@@ -20,7 +20,7 @@ repositories {
 dependencies {
     apply plugin: 'java'
     compile "org.spongepowered:spongeapi:${spongeAPI}-$spongeChannel"
-    compileOnly 'com.github.dags-:TextMU:0.1'
+    compile 'com.github.dags-:TextMU:0.1'
 }
 
 shadowJar {
